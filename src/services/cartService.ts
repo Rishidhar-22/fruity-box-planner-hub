@@ -72,8 +72,14 @@ export async function getCart() {
 
     if (itemsError) throw itemsError;
 
+    // Initialize custom_items as an empty array for each cart item
+    const typedCartItems: CartItem[] = cartItems.map(item => ({
+      ...item,
+      custom_items: []
+    }));
+
     // For custom boxes, fetch the custom items
-    for (const item of cartItems) {
+    for (const item of typedCartItems) {
       if (item.is_custom) {
         const { data: customItems, error: customError } = await supabase
           .from("custom_box_items")
@@ -92,7 +98,7 @@ export async function getCart() {
       }
     }
 
-    return { cartId, items: cartItems as CartItem[] };
+    return { cartId, items: typedCartItems };
   } catch (error: any) {
     console.error("Error fetching cart:", error);
     toast({
