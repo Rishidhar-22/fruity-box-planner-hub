@@ -32,21 +32,15 @@ function getSessionId(): string {
   return sessionId;
 }
 
-// Create a custom Supabase client with session ID header
-const getSupabaseWithSession = () => {
-  const currentSessionId = getSessionId();
-  return supabase.from('').headers({ 'x-session-id': currentSessionId });
-}
-
 export async function getCart() {
   try {
-    const supabaseWithSession = getSupabaseWithSession();
+    const currentSessionId = getSessionId();
     
     // First check if a cart exists for this session
-    const { data: carts, error: cartError } = await supabaseWithSession
+    const { data: carts, error: cartError } = await supabase
       .from("carts")
       .select("*")
-      .eq("session_id", getSessionId())
+      .eq("session_id", currentSessionId)
       .maybeSingle();
 
     if (cartError) throw cartError;
@@ -54,9 +48,9 @@ export async function getCart() {
     // If no cart exists, create one
     let cartId;
     if (!carts) {
-      const { data: newCart, error: createError } = await supabaseWithSession
+      const { data: newCart, error: createError } = await supabase
         .from("carts")
-        .insert({ session_id: getSessionId() })
+        .insert({ session_id: currentSessionId })
         .select("*")
         .single();
 
@@ -67,7 +61,7 @@ export async function getCart() {
     }
 
     // Fetch cart items
-    const { data: cartItems, error: itemsError } = await supabaseWithSession
+    const { data: cartItems, error: itemsError } = await supabase
       .from("cart_items")
       .select(`
         *,
@@ -86,7 +80,7 @@ export async function getCart() {
     // For custom boxes, fetch the custom items
     for (const item of typedCartItems) {
       if (item.is_custom) {
-        const { data: customItems, error: customError } = await supabaseWithSession
+        const { data: customItems, error: customError } = await supabase
           .from("custom_box_items")
           .select(`
             quantity,
@@ -117,14 +111,12 @@ export async function getCart() {
 
 export async function addBoxToCart(boxId: string, quantity: number = 1) {
   try {
-    const supabaseWithSession = getSupabaseWithSession();
-    
     // Get cart ID
     const { cartId } = await getCart();
     if (!cartId) throw new Error("Could not get cart");
 
     // Get box price
-    const { data: boxData, error: boxError } = await supabaseWithSession
+    const { data: boxData, error: boxError } = await supabase
       .from("fruit_boxes")
       .select("price")
       .eq("id", boxId)
@@ -135,7 +127,7 @@ export async function addBoxToCart(boxId: string, quantity: number = 1) {
     // Add item to cart
     const totalPrice = boxData.price * quantity;
     
-    const { data, error } = await supabaseWithSession
+    const { data, error } = await supabase
       .from("cart_items")
       .insert({
         cart_id: cartId,
@@ -168,8 +160,6 @@ export async function addBoxToCart(boxId: string, quantity: number = 1) {
 
 export async function addCustomBoxToCart(fruits: { fruitId: string; quantity: number }[], quantity: number = 1) {
   try {
-    const supabaseWithSession = getSupabaseWithSession();
-    
     // Get cart ID
     const { cartId } = await getCart();
     if (!cartId) throw new Error("Could not get cart");
@@ -177,7 +167,7 @@ export async function addCustomBoxToCart(fruits: { fruitId: string; quantity: nu
     // Calculate total price
     let totalPrice = 0;
     for (const item of fruits) {
-      const { data: fruitData, error: fruitError } = await supabaseWithSession
+      const { data: fruitData, error: fruitError } = await supabase
         .from("fruits")
         .select("price")
         .eq("id", item.fruitId)
@@ -190,7 +180,7 @@ export async function addCustomBoxToCart(fruits: { fruitId: string; quantity: nu
     totalPrice *= quantity;
 
     // Add custom box to cart
-    const { data: cartItem, error: cartItemError } = await supabaseWithSession
+    const { data: cartItem, error: cartItemError } = await supabase
       .from("cart_items")
       .insert({
         cart_id: cartId,
@@ -210,7 +200,7 @@ export async function addCustomBoxToCart(fruits: { fruitId: string; quantity: nu
       quantity: fruit.quantity
     }));
 
-    const { error: customItemsError } = await supabaseWithSession
+    const { error: customItemsError } = await supabase
       .from("custom_box_items")
       .insert(customItems);
 
@@ -235,10 +225,8 @@ export async function addCustomBoxToCart(fruits: { fruitId: string; quantity: nu
 
 export async function updateCartItemQuantity(itemId: string, quantity: number) {
   try {
-    const supabaseWithSession = getSupabaseWithSession();
-    
     // Get the cart item to update
-    const { data: cartItem, error: itemError } = await supabaseWithSession
+    const { data: cartItem, error: itemError } = await supabase
       .from("cart_items")
       .select("*")
       .eq("id", itemId)
@@ -251,7 +239,7 @@ export async function updateCartItemQuantity(itemId: string, quantity: number) {
     const newTotalPrice = pricePerUnit * quantity;
 
     // Update the quantity
-    const { error } = await supabaseWithSession
+    const { error } = await supabase
       .from("cart_items")
       .update({ 
         quantity, 
@@ -280,9 +268,7 @@ export async function updateCartItemQuantity(itemId: string, quantity: number) {
 
 export async function removeCartItem(itemId: string) {
   try {
-    const supabaseWithSession = getSupabaseWithSession();
-    
-    const { error } = await supabaseWithSession
+    const { error } = await supabase
       .from("cart_items")
       .delete()
       .eq("id", itemId);
