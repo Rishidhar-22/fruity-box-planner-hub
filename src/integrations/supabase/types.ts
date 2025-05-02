@@ -9,7 +9,330 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      cart_items: {
+        Row: {
+          box_id: string | null
+          cart_id: string
+          created_at: string
+          id: string
+          is_custom: boolean
+          quantity: number
+          total_price: number
+        }
+        Insert: {
+          box_id?: string | null
+          cart_id: string
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          quantity?: number
+          total_price: number
+        }
+        Update: {
+          box_id?: string | null
+          cart_id?: string
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          quantity?: number
+          total_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_box_id_fkey"
+            columns: ["box_id"]
+            isOneToOne: false
+            referencedRelation: "fruit_boxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_cart_id_fkey"
+            columns: ["cart_id"]
+            isOneToOne: false
+            referencedRelation: "carts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carts: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      custom_box_items: {
+        Row: {
+          cart_item_id: string
+          created_at: string
+          fruit_id: string
+          id: string
+          quantity: number
+        }
+        Insert: {
+          cart_item_id: string
+          created_at?: string
+          fruit_id: string
+          id?: string
+          quantity: number
+        }
+        Update: {
+          cart_item_id?: string
+          created_at?: string
+          fruit_id?: string
+          id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_box_items_cart_item_id_fkey"
+            columns: ["cart_item_id"]
+            isOneToOne: false
+            referencedRelation: "cart_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_box_items_fruit_id_fkey"
+            columns: ["fruit_id"]
+            isOneToOne: false
+            referencedRelation: "fruits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fruit_box_items: {
+        Row: {
+          box_id: string
+          created_at: string
+          fruit_id: string
+          id: string
+          quantity: number
+        }
+        Insert: {
+          box_id: string
+          created_at?: string
+          fruit_id: string
+          id?: string
+          quantity: number
+        }
+        Update: {
+          box_id?: string
+          created_at?: string
+          fruit_id?: string
+          id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fruit_box_items_box_id_fkey"
+            columns: ["box_id"]
+            isOneToOne: false
+            referencedRelation: "fruit_boxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fruit_box_items_fruit_id_fkey"
+            columns: ["fruit_id"]
+            isOneToOne: false
+            referencedRelation: "fruits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fruit_boxes: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      fruits: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          price: number
+          stock_quantity: number
+          unit: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          price: number
+          stock_quantity?: number
+          unit?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          price?: number
+          stock_quantity?: number
+          unit?: string
+        }
+        Relationships: []
+      }
+      order_item_contents: {
+        Row: {
+          created_at: string
+          fruit_id: string
+          fruit_name: string
+          id: string
+          order_item_id: string
+          price_per_unit: number
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          fruit_id: string
+          fruit_name: string
+          id?: string
+          order_item_id: string
+          price_per_unit: number
+          quantity: number
+        }
+        Update: {
+          created_at?: string
+          fruit_id?: string
+          fruit_name?: string
+          id?: string
+          order_item_id?: string
+          price_per_unit?: number
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_item_contents_fruit_id_fkey"
+            columns: ["fruit_id"]
+            isOneToOne: false
+            referencedRelation: "fruits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_item_contents_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          box_id: string | null
+          created_at: string
+          id: string
+          is_custom: boolean
+          order_id: string
+          price: number
+          quantity: number
+        }
+        Insert: {
+          box_id?: string | null
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          order_id: string
+          price: number
+          quantity?: number
+        }
+        Update: {
+          box_id?: string | null
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          order_id?: string
+          price?: number
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_box_id_fkey"
+            columns: ["box_id"]
+            isOneToOne: false
+            referencedRelation: "fruit_boxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          id: string
+          payment_intent_id: string | null
+          shipping_address: Json | null
+          status: string
+          total_amount: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payment_intent_id?: string | null
+          shipping_address?: Json | null
+          status?: string
+          total_amount: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payment_intent_id?: string | null
+          shipping_address?: Json | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
